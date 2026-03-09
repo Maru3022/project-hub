@@ -1,50 +1,354 @@
-# 🚀 Training Ecosystem (Microservices Project Hub)
+# 🚀 Training Ecosystem — Microservices Platform
 
-### ⚡ Enterprise-grade распределенная система на Java 17 / Spring Boot 3
-Профессиональная экосистема для управления тренировками и питанием, построенная на принципах **High Availability**, **Scalability** и **Event-Driven Design**.
+Высоконагруженная микросервисная система для управления тренировками, упражнениями и питанием.
 
----
+Проект реализован на **Java + Spring Boot** и демонстрирует современную backend-архитектуру:
 
-## 🏆 Ключевые технологические решения (Architecture Highlights)
+- Microservices Architecture
+- Event Driven Architecture
+- Distributed Systems
+- High Scalability
+- High Availability
 
-* **🔍 Full-Text Search (Elasticsearch):** Внедрен мощный поисковый движок для мгновенной фильтрации упражнений, продуктов и программ тренировок по сложным критериям и неполным совпадениям.
-* **⚡ Distributed Caching (Redis):** Реализован слой кэширования для оптимизации производительности. Redis используется для хранения сессий и кэширования ресурсоемких расчетов КБЖУ, снижая нагрузку на PostgreSQL.
-* **📡 Event-Driven Interaction (Apache Kafka):** Сервисы общаются через брокер сообщений. Это гарантирует доставку уведомлений и консистентность данных без жесткой связности (decoupling) модулей.
-* **🌐 Service Mesh & Discovery:** Автоматическая регистрация инстансов через **Eureka** и интеллектуальная маршрутизация через **Spring Cloud Gateway** с поддержкой Rate Limiting.
-* **🐳 Infrastructure as Code (Docker):** Полная оркестрация всей среды (микросервисы + Redis + Kafka + Elastic + DB) одной командой.
-
----
-
-## 🔍 Подробный обзор микросервисов
-
-### 🔌 Инфраструктурный слой (Core)
-| Сервис | Технологии | Роль и фичи |
-| :--- | :--- | :--- |
-| **[API Gateway](https://github.com/Maru3022/API_Gateway.git)** | Spring Cloud Gateway | Единая точка входа. Реализована маршрутизация, CORS-политики и защита внутреннего контура. |
-| **[Eureka Server](https://github.com/Maru3022/Eureka-server.git)** | Netflix Eureka | Service Discovery. Обеспечивает динамическое обнаружение сервисов и балансировку нагрузки. |
-
-### 🥗 Бизнес-логика (Business Logic)
-| Сервис | Стек | Описание реализации |
-| :--- | :--- | :--- |
-| **Recommendation** | Spring Data, JPA | **ML-ready модуль.** Алгоритмический подбор планов на основе анализа истории активности пользователя. [Link](https://github.com/Maru3022/Recommendation-Service.git) |
-| **Trains Service** | **Elasticsearch**, Java 17 | **Search Engine.** Управление планами с использованием Elastic для быстрого поиска по базе тренировок. [Link](https://github.com/Maru3022/Trains-Service.git) |
-| **Nutrition** | **Redis**, PostgreSQL | **High-performance расчеты.** Кэширование данных о нутриентах в Redis для мгновенного отклика UI. [Link](https://github.com/Maru3022/Training-Nutrition.git) |
-| **Notification** | **Apache Kafka** | **Reactive Consumer.** Асинхронная обработка и отправка уведомлений пользователям в реальном времени. [Link](https://github.com/Maru3022/Training_Notification.git) |
-| **Training Service**| Spring Data | **Dictionary Service.** Обработка и хранение расширенной базы упражнений и их классификация. [Link](https://github.com/Maru3022/Training-Servive.git) |
+Система состоит из **7 независимых сервисов**, взаимодействующих через **API Gateway**, **Service Discovery** и **Kafka events**.
 
 ---
 
-## 🏗 Full Tech Stack
-* **Backend:** Java 17/21, Spring Boot, Spring Cloud (Gateway, Eureka).
-* **Data Stores:** PostgreSQL, **Redis** (Cache), **Elasticsearch** (Search).
-* **Messaging:** **Apache Kafka**.
-* **DevOps:** Docker, Docker Compose, Healthchecks.
+# 🏗 Архитектура системы
+
+Архитектура построена на принципах **микросервисного подхода**, где каждый сервис отвечает за свою область бизнес-логики.
+
+Основные принципы:
+
+- независимое масштабирование сервисов  
+- слабая связность (loose coupling)  
+- асинхронное взаимодействие через события  
+- отказоустойчивость системы  
+
+## Общая схема
+
+```
+Client
+   │
+   ▼
+API Gateway
+   │
+   ▼
+Service Discovery (Eureka)
+   │
+   ├── Training Service
+   ├── Trains Service
+   ├── Nutrition Service
+   ├── Recommendation Service
+   └── Notification Service
+```
+
+Инфраструктурные компоненты:
+
+- PostgreSQL
+- Redis
+- Elasticsearch
+- Apache Kafka
+- Docker
 
 ---
 
-## 🚀 Быстрый старт (Deployment)
+# 🧠 Основные технологические решения
 
-Вся инфраструктура (включая Elastic, Kafka и Redis) разворачивается автоматически:
+## 🔍 Elasticsearch — Full Text Search
 
-```bash
+Используется для **быстрого поиска тренировок и упражнений**.
+
+Позволяет:
+
+- выполнять поиск по неполному совпадению
+- фильтровать данные по различным параметрам
+- выполнять сложные поисковые запросы
+
+Это значительно быстрее обычных SQL запросов при работе с большим количеством данных.
+
+---
+
+## ⚡ Redis — Distributed Cache
+
+Redis используется как **in-memory кэш**.
+
+Позволяет:
+
+- ускорить получение данных
+- снизить нагрузку на PostgreSQL
+- хранить часто используемые данные
+
+Примеры использования:
+
+- кэширование данных о питании
+- ускорение вычислений КБЖУ
+
+---
+
+## 📡 Apache Kafka — Event Driven Communication
+
+Сервисы взаимодействуют **асинхронно через события**.
+
+Преимущества:
+
+- слабая связность сервисов
+- высокая устойчивость системы
+- возможность обработки событий в реальном времени
+
+Пример взаимодействия:
+
+```
+Training Service → Kafka → Notification Service
+```
+
+Когда создается новая тренировка, отправляется событие, и Notification Service отправляет уведомление пользователю.
+
+---
+
+## 🌐 API Gateway
+
+API Gateway является **единой точкой входа в систему**.
+
+Функции:
+
+- маршрутизация запросов
+- балансировка нагрузки
+- CORS конфигурация
+- централизованный доступ к сервисам
+
+Все клиентские запросы проходят через Gateway.
+
+---
+
+## 🔎 Service Discovery (Eureka)
+
+Используется для **динамического обнаружения сервисов**.
+
+Каждый сервис:
+
+- регистрируется в Eureka
+- получает список других сервисов
+
+Это позволяет системе автоматически масштабироваться.
+
+---
+
+# 🔍 Микросервисы проекта
+
+## 🌐 API Gateway
+
+Repository  
+https://github.com/Maru3022/API_Gateway
+
+Технологии:
+
+- Spring Cloud Gateway
+- Spring Boot
+
+Функции:
+
+- единая точка входа
+- маршрутизация запросов
+- проксирование запросов к сервисам
+
+---
+
+## 🔎 Eureka Server
+
+Repository  
+https://github.com/Maru3022/Eureka-server
+
+Технологии:
+
+- Spring Cloud Netflix Eureka
+
+Функции:
+
+- регистрация сервисов
+- обнаружение сервисов
+- балансировка нагрузки
+
+Каждый сервис автоматически регистрируется в системе.
+
+---
+
+## 🏋 Training Service
+
+Repository  
+https://github.com/Maru3022/Training-Servive
+
+Технологии:
+
+- Java
+- Spring Boot
+- Spring Data JPA
+- PostgreSQL
+
+Функции:
+
+- хранение базы упражнений
+- управление тренировками
+- CRUD операции
+
+Основной сервис для управления тренировочными программами.
+
+---
+
+## 🔍 Trains Service
+
+Repository  
+https://github.com/Maru3022/Trains-Service
+
+Технологии:
+
+- Java
+- Spring Boot
+- Elasticsearch
+
+Функции:
+
+- быстрый поиск тренировок
+- фильтрация программ
+- full text search
+
+Сервис оптимизирован для быстрого поиска данных.
+
+---
+
+## 🥗 Nutrition Service
+
+Repository  
+https://github.com/Maru3022/Training-Nutrition
+
+Технологии:
+
+- Java
+- Spring Boot
+- PostgreSQL
+- Redis
+
+Функции:
+
+- управление питанием
+- расчет КБЖУ
+- кэширование данных
+
+Redis используется для ускорения обработки данных.
+
+---
+
+## 🤖 Recommendation Service
+
+Repository  
+https://github.com/Maru3022/Recommendation-Service
+
+Технологии:
+
+- Java
+- Spring Boot
+- Spring Data JPA
+- PostgreSQL
+
+Функции:
+
+- рекомендации тренировок
+- анализ активности пользователя
+- генерация персональных программ
+
+Сервис реализует алгоритмический подбор тренировок.
+
+---
+
+## 🔔 Notification Service
+
+Repository  
+https://github.com/Maru3022/Training_Notification
+
+Технологии:
+
+- Java
+- Spring Boot
+- Apache Kafka
+
+Функции:
+
+- обработка событий из Kafka
+- отправка уведомлений
+- асинхронная обработка данных
+
+---
+
+# 🧰 Полный стек технологий
+
+### Backend
+
+- Java 17 / 21
+- Spring Boot 3
+- Spring Data JPA
+- Spring Cloud
+
+### Infrastructure
+
+- Spring Cloud Gateway
+- Netflix Eureka
+
+### Databases
+
+- PostgreSQL
+- Redis
+- Elasticsearch
+
+### Messaging
+
+- Apache Kafka
+
+### DevOps
+
+- Docker
+- Docker Compose
+
+---
+
+# 🐳 Запуск проекта
+
+### 1. Клонировать репозитории
+
+```
+git clone https://github.com/Maru3022/API_Gateway
+git clone https://github.com/Maru3022/Eureka-server
+git clone https://github.com/Maru3022/Training-Servive
+git clone https://github.com/Maru3022/Trains-Service
+git clone https://github.com/Maru3022/Training-Nutrition
+git clone https://github.com/Maru3022/Recommendation-Service
+git clone https://github.com/Maru3022/Training_Notification
+```
+
+---
+
+### 2. Запустить инфраструктуру
+
+```
 docker-compose up -d
+```
+
+Это автоматически поднимет:
+
+- PostgreSQL
+- Redis
+- Kafka
+- Elasticsearch
+- все микросервисы
+
+---
+
+# 📈 Цель проекта
+
+Основная цель проекта — продемонстрировать навыки разработки:
+
+- микросервисной архитектуры
+- распределенных систем
+- высоконагруженных backend сервисов
+- работы с современным Java стеком
+
+Проект является примером **production-like backend системы**, включающей caching, messaging, search engine и service discovery.
